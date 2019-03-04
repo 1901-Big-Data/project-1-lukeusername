@@ -1,11 +1,14 @@
 package com.revature.LukeProject1.LukeProject1;
 
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 
 /**
  * OVERARCHING GOAL: "Identify special programs aimed at women across the globe."
@@ -32,17 +35,17 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
  * @author Luke Davis
  *
  */
-public class Project1Driver {
+public class Project1Driver extends Configured implements Tool {
 
-	public static void main(String[] args) throws Exception {
+	@Override
+	public int run(String[] args) throws Exception {
 		if (args.length != 2) {
 			System.out.printf(
 					"Usage: Project1Driver <input dir> <output dir>\n");
-			System.exit(-1);
+			return -1;
 		}
 
-		Job job = new Job();
-
+		Job job = new Job(getConf());
 		job.setJarByClass(Project1Driver.class);
 		job.setJobName("Countries with females grad-rate < 30%");
 
@@ -56,6 +59,10 @@ public class Project1Driver {
 		job.setOutputValueClass(Text.class);
 		
 		boolean success = job.waitForCompletion(true);
-		System.exit(success ? 0 : 1);
+		return success ? 0 : 1;
+	}
+	public static void main(String[] args) throws Exception {
+		int exitCode = ToolRunner.run(new Configuration(), new Project1Driver(), args);
+		System.exit(exitCode);
 	}
 }

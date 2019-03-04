@@ -1,14 +1,15 @@
 package com.revature.LukeProject1.LukeProject1.AveInc;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-
-import com.revature.LukeProject1.LukeProject1.FemaleGradReducer;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 
 /**
  * OVERARCHING GOAL: "Identify special programs aimed at women across the globe."
@@ -37,17 +38,16 @@ import com.revature.LukeProject1.LukeProject1.FemaleGradReducer;
  * @author Luke Davis
  *
  */
-public class P1DriverQ2 {
-
-	public static void main(String[] args) throws Exception {
+public class P1DriverQ2 extends Configured implements Tool {
+	@Override
+	public int run(String[] args) throws Exception {
 		if (args.length != 2) {
 			System.out.printf(
 					"Usage: Project1Driver <input dir> <output dir>\n");
-			System.exit(-1);
+			return -1;
 		}
 
-		Job job = new Job();
-
+		Job job = new Job(getConf());
 		job.setJarByClass(P1DriverQ2.class);
 		job.setJobName("Average increase in female education in the U.S. from the year 2000.");
 
@@ -61,6 +61,10 @@ public class P1DriverQ2 {
 		job.setOutputValueClass(Text.class);
 		
 		boolean success = job.waitForCompletion(true);
-		System.exit(success ? 0 : 1);
+		return success ? 0 : 1;
+	}
+	public static void main(String[] args) throws Exception {
+		int exitCode = ToolRunner.run(new Configuration(), new P1DriverQ2(), args);
+		System.exit(exitCode);
 	}
 }
